@@ -1,7 +1,9 @@
 package com.develcode.checkout.queue;
 
-public interface QueueProducer {
-    void produceErrorNotification();
+import com.develcode.checkout.dto.OrderStatusDto;
 
-    void produceOrderStatusNotification();
+public interface QueueProducer {
+    void produceErrorNotification(String message);
+
+    void produceOrderStatusNotification(OrderStatusDto orderStatusDto);
 }

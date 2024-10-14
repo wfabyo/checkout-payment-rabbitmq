@@ -1,4 +1,5 @@
 services:
+    
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: 'rabbitmq'
@@ -9,8 +10,21 @@ services:
         - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
         - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
-        - rabbitmq_go_net
+        - internalnet
+
+  postgres: 
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: "DatabaseTest"
+    volumes:
+      - ./sql/01-create_table_order.sql:/docker-entrypoint-initdb.d/01-create_table_order.sql
+    networks:
+      - internalnet
+
 
 networks:
-  rabbitmq_go_net:
+  internalnet:
     driver: bridge

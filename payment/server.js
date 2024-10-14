@@ -1,11 +1,11 @@
-const express = require('express');
+require('dotenv').config();
 const amqp = require('amqplib');
+const { app, setupRoutes } = require('./app');
 const PaymentService = require('./paymentService');
 
-const app = express();
-app.use(express.json());
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost';
+const PORT = process.env.PORT || 3000;
 
-const RABBITMQ_URL = 'amqp://localhost'; // Ajuste conforme necessário
 
 async function startServer() {
     const connection = await amqp.connect(RABBITMQ_URL);
@@ -15,16 +15,9 @@ async function startServer() {
     await channel.assertExchange('payment-exchange', 'topic', { durable: true });
 
     const paymentService = new PaymentService(channel);
+    setupRoutes(paymentService);
 
-    channel.consume('payment-process-queue', async (msg) => {
-        if (msg !== null) {
-            const order = JSON.parse(msg.content.toString());
-            await paymentService.processPayment(order);
-            channel.ack(msg);
-        }
-    });
-
-    app.listen(3000, () => console.log('Payment Gateway service running on port 3000'));
+    app.listen(PORT, () => console.log(`Payment Gateway service running on port ${PORT}`));
 }
 
 startServer().catch(console.error);

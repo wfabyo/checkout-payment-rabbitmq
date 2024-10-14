@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-CheckoutApplication<checkout>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.develcode.checkout.CheckoutApplication",
+            "projectName": "checkout",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

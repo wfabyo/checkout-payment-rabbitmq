@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.develcode.checkout.dto.CreateOrderDto;
 import com.develcode.checkout.model.Order;
 import com.develcode.checkout.service.OrderService;
 
@@ -17,7 +18,8 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+    public ResponseEntity<Order> createOrder(@RequestBody CreateOrderDto createOrder) {
+        Order order = Order.builder().amount(createOrder.amount()).customerName(createOrder.customerName()).build();
         return ResponseEntity.ok(orderService.createOrder(order));
     }
 }

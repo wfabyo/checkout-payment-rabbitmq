@@ -16,12 +16,42 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue internalErrorQueue() {
+        return new Queue("internal-error-queue", true);
+    }
+
+    @Bean
+    public Queue noticeCustomerQueue() {
+        return new Queue("notice-customer-queue", true);
+    }
+
+    @Bean
+    public TopicExchange internalErrorExchange() {
+        return new TopicExchange("internal-error-exchange");
+    }
+
+    @Bean
+    public TopicExchange noticeCustomerExchange() {
+        return new TopicExchange("notice-customer-exchange");
+    }
+
+    @Bean
     public TopicExchange paymentExchange() {
         return new TopicExchange("payment-exchange");
     }
 
     @Bean
-    public Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with("payment.result");
+    public Binding binding() {
+        return BindingBuilder.bind(paymentResultQueue()).to(paymentExchange()).with("payment.result");
+    }
+
+    @Bean
+    public Binding internalErrorBinding() {
+        return BindingBuilder.bind(internalErrorQueue()).to(internalErrorExchange()).with("internal.error.notice");
+    }
+
+    @Bean
+    public Binding noticeCustomerBinding() {
+        return BindingBuilder.bind(noticeCustomerQueue()).to(noticeCustomerExchange()).with("customer.notice");
     }
 } 

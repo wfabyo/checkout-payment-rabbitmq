@@ -1,31 +1,39 @@
 package com.develcode.checkout.queue.impl;
 
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageBuilder;
-import org.springframework.amqp.core.MessagePropertiesBuilder;
+import org.json.JSONObject;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import com.develcode.checkout.dto.OrderStatusDto;
 import com.develcode.checkout.queue.QueueProducer;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
+@Component
 public class RabbitMQQueueProducer implements QueueProducer{
 
-    @Autowired
-    RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
-    public void produceErrorNotification() {
-        String json = "{\"foo\" : \"value\" }";
-		Message jsonMessage = MessageBuilder.withBody(json.getBytes())
-				.andProperties(MessagePropertiesBuilder.newInstance().setContentType("application/json")
-				.build()).build();
-
-		rabbitTemplate.send("${checkout.queues}", jsonMessage);
+    public void produceErrorNotification(String message) {
+        try{
+            rabbitTemplate.convertAndSend("internal-error-exchange", "internal.error.notice", message);
+        } catch(AmqpException e) {
+            e.printStackTrace();
+            //TODO: Tratar erro ao enviar notificação
+        }
     }
 
     @Override
-    public void produceOrderStatusNotification() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void produceOrderStatusNotification(OrderStatusDto orderStatus) {
+        try{
+            rabbitTemplate.convertAndSend("notice-customer-exchange", "customer.notice", JSONObject.valueToString(orderStatus));
+        } catch(AmqpException e) {
+            e.printStackTrace();
+            //TODO: Tratar erro ao enviar notificação
+        }
     }
     
 }
